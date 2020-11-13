@@ -59,8 +59,10 @@ radio.setGroup(0)
 radio.setTransmitPower(7)
 soundON = 0
 lightsON = 0
+comment.comment("Options: 0=glowing RGB; 1=accel. controlled RGB ")
+let RGBoption = 1
 bubbleSort = 0
-let dataSample1 = 12
+let dataSample1 = 10
 comment.comment("END runtime configuration")
 let ultrasonicData = [dataSample1]
 let counter = 0
@@ -96,30 +98,47 @@ basic.forever(function () {
     }
 })
 basic.forever(function () {
+    comment.comment("Option 0: glowing RGB leds")
     while (lightsON) {
-        red = 0
-        green = 0
-        blue = 255
-        for (let index = 0; index < 255; index++) {
-            red += 1
-            blue += -1
-            strip.showColor(neopixel.rgb(red, green, blue))
-            basic.pause(1)
-        }
-        for (let index = 0; index < 255; index++) {
-            green += 1
-            red += -1
-            strip.showColor(neopixel.rgb(red, green, blue))
-            basic.pause(1)
-        }
-        for (let index = 0; index < 255; index++) {
-            blue += 1
-            green += -1
-            strip.showColor(neopixel.rgb(red, green, blue))
-            basic.pause(1)
+        while (RGBoption) {
+            red = 0
+            green = 0
+            blue = 255
+            for (let index = 0; index < 255; index++) {
+                red += 1
+                blue += -1
+                strip.showColor(neopixel.rgb(red, green, blue))
+                basic.pause(1)
+            }
+            for (let index = 0; index < 255; index++) {
+                green += 1
+                red += -1
+                strip.showColor(neopixel.rgb(red, green, blue))
+                basic.pause(1)
+            }
+            for (let index = 0; index < 255; index++) {
+                blue += 1
+                green += -1
+                strip.showColor(neopixel.rgb(red, green, blue))
+                basic.pause(1)
+            }
         }
     }
     strip.showColor(neopixel.colors(NeoPixelColors.Black))
+})
+basic.forever(function () {
+    comment.comment("Option 1: accelerometer controls RGB colors")
+    while (lightsON) {
+        while (RGBoption) {
+            red = input.acceleration(Dimension.X) / 2
+            green = input.acceleration(Dimension.Y) / 2
+            blue = 0 - input.acceleration(Dimension.Z) / 2
+            strip.shift(1)
+            strip.setPixelColor(0, neopixel.rgb(red, green, blue))
+            strip.show()
+            basic.pause(100)
+        }
+    }
 })
 basic.forever(function () {
     while (lightsON) {
