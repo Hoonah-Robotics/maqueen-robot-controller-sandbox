@@ -30,7 +30,7 @@ input.onButtonPressed(Button.B, function () {
 })
 radio.onReceivedValue(function (name, value) {
     comment.comment("SENSE: read accelerometer on driver station")
-    comment.comment("range of values: -40 to 40; 0 = STOP")
+    comment.comment("range of values: -255 to 255; 0 = STOP")
     if (name == "y") {
         throttle = value
     } else if (name == "x") {
@@ -79,20 +79,20 @@ basic.forever(function () {
     vectorLeft = throttle + turn
     vectorRight = throttle - turn
     comment.comment("Scale motor power from 0 to 255")
-    scalarLeft = Math.map(Math.abs(vectorLeft), 0, 40, 0, 255)
-    scalarRight = Math.map(Math.abs(vectorRight), 0, 40, 0, 255)
+    scalarLeft = vectorLeft
+    scalarRight = vectorRight
     comment.comment("ACT: send speed and direction to motors ")
     if (vectorLeft > 0) {
-        maqueen.motorRun(maqueen.Motors.M1, maqueen.Dir.CW, scalarLeft)
+        maqueen.motorRun(maqueen.Motors.M1, maqueen.Dir.CW, vectorLeft)
     } else if (vectorLeft < 0) {
-        maqueen.motorRun(maqueen.Motors.M1, maqueen.Dir.CCW, scalarLeft)
+        maqueen.motorRun(maqueen.Motors.M1, maqueen.Dir.CCW, Math.abs(vectorLeft))
     } else {
         maqueen.motorStop(maqueen.Motors.M1)
     }
     if (vectorRight > 0) {
-        maqueen.motorRun(maqueen.Motors.M2, maqueen.Dir.CW, scalarRight)
+        maqueen.motorRun(maqueen.Motors.M2, maqueen.Dir.CW, vectorRight)
     } else if (vectorRight < 0) {
-        maqueen.motorRun(maqueen.Motors.M2, maqueen.Dir.CCW, scalarRight)
+        maqueen.motorRun(maqueen.Motors.M2, maqueen.Dir.CCW, Math.abs(vectorRight))
     } else {
         maqueen.motorStop(maqueen.Motors.M2)
     }
@@ -141,28 +141,6 @@ basic.forever(function () {
     }
 })
 basic.forever(function () {
-    while (lightsON) {
-        maqueen.writeLED(maqueen.LED.LEDLeft, maqueen.LEDswitch.turnOn)
-        maqueen.writeLED(maqueen.LED.LEDRight, maqueen.LEDswitch.turnOff)
-        if (soundON) {
-            music.playTone(587, music.beat(BeatFraction.Whole))
-            basic.pause(100)
-        } else {
-            basic.pause(200)
-        }
-        maqueen.writeLED(maqueen.LED.LEDLeft, maqueen.LEDswitch.turnOff)
-        maqueen.writeLED(maqueen.LED.LEDRight, maqueen.LEDswitch.turnOn)
-        if (soundON) {
-            music.playTone(440, music.beat(BeatFraction.Whole))
-            basic.pause(100)
-        } else {
-            basic.pause(200)
-        }
-        maqueen.writeLED(maqueen.LED.LEDLeft, maqueen.LEDswitch.turnOff)
-        maqueen.writeLED(maqueen.LED.LEDRight, maqueen.LEDswitch.turnOff)
-    }
-})
-basic.forever(function () {
     if (bubbleSort) {
         comment.comment("read ultrasonic")
         for (let index = 0; index <= dataSample1; index++) {
@@ -197,4 +175,26 @@ basic.forever(function () {
 basic.forever(function () {
     OLED12864_I2C.Number(maqueen.readPatrol(maqueen.Patrol.PatrolLeft), 105, 1, 1)
     OLED12864_I2C.Number(maqueen.readPatrol(maqueen.Patrol.PatrolRight), 115, 1, 1)
+})
+basic.forever(function () {
+    while (lightsON) {
+        maqueen.writeLED(maqueen.LED.LEDLeft, maqueen.LEDswitch.turnOn)
+        maqueen.writeLED(maqueen.LED.LEDRight, maqueen.LEDswitch.turnOff)
+        if (soundON) {
+            music.playTone(587, music.beat(BeatFraction.Whole))
+            basic.pause(100)
+        } else {
+            basic.pause(200)
+        }
+        maqueen.writeLED(maqueen.LED.LEDLeft, maqueen.LEDswitch.turnOff)
+        maqueen.writeLED(maqueen.LED.LEDRight, maqueen.LEDswitch.turnOn)
+        if (soundON) {
+            music.playTone(440, music.beat(BeatFraction.Whole))
+            basic.pause(100)
+        } else {
+            basic.pause(200)
+        }
+        maqueen.writeLED(maqueen.LED.LEDLeft, maqueen.LEDswitch.turnOff)
+        maqueen.writeLED(maqueen.LED.LEDRight, maqueen.LEDswitch.turnOff)
+    }
 })
